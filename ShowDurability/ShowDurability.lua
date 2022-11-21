@@ -43,7 +43,6 @@ local print = function(msg) print("|cFF5555AA"..name..": |cFFAAAAFF"..msg) end
 local WowVer = select(4, GetBuildInfo())
 local IsClassic = WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
--- Stores equipped item info
 local slots = { }
 do
 	local slotNames = { "Head", "Shoulder", "Chest", "Wrist", "Hands", "Waist", "Legs", "Feet", "MainHand", "SecondaryHand" }
@@ -52,16 +51,15 @@ do
 	end
 	for i,name in ipairs(slotNames) do
 		slots[ i ] = {
-			GetInventorySlotInfo(name.."Slot"), -- slotId
-			name, -- slotName, used for translation
-			-1,    -- Durability
-			0,    -- Cost
-			2     -- Tooltip line
+			GetInventorySlotInfo(name.."Slot"),
+			name,
+			-1,
+			0,
+			2
 		}
 	end
 end
 
--- States
 local states = {
 	autoRepair = {
 		default = 1,
@@ -101,31 +99,6 @@ local states = {
 			status    = L["Disabled"],
 			nextState = 4,
 		},
-		[4] = {
-			color     = "|cFF00FF00",
-			status    = FACTION_STANDING_LABEL4,
-			nextState = 5,
-		},
-		[5] = {
-			color     = "|cFF00FF00",
-			status    = FACTION_STANDING_LABEL5,
-			nextState = 6,
-		},
-		[6] = {
-			color     = "|cFF00FF00",
-			status    = FACTION_STANDING_LABEL6,
-			nextState = 7,
-		},
-		[7] = {
-			color     = "|cFF00FF00",
-			status    = FACTION_STANDING_LABEL7,
-			nextState = 8,
-		},
-		[8] = {
-			color     = "|cFF00FF00",
-			status    = FACTION_STANDING_LABEL8,
-			nextState = 0,
-		},
 	},
 }
 
@@ -134,40 +107,33 @@ function Repair:OnLoad()
 		ShowDurabilityDB = { }
 	end
 	for key,state in pairs(states) do
-		-- Reset to known states
 		if not ShowDurabilityDB[key] or not states[key][ ShowDurabilityDB[key] ] then
 			ShowDurabilityDB[key] = state.default
 		end
 	end
 
-	-- Clean up saved vars
 	ShowDurabilityDB["useGuildBank"] = nil
 
-	-- Update tooltip
 	ShowDurability_Popup_Repair:SetText(L["Repair"])
 	ShowDurability_Popup_Title:SetText(L["ShowDurability"])
 	ShowDurability_Popup_GuildRepair:SetText(L["GuildRepair"])
 
-	-- Register @ LibBrokers
 	Repair = LibDataBroker:NewDataObject(name, Repair)
-	ShowDurability = Repair -- Register globaly
+	ShowDurability = Repair
 end
 
----------------------------------
--- Support functions
----------------------------------
 local DurabilityColor = function(perc)
 	if not perc or perc < 0 then return "|cFF555555" end
 	if perc == 1 then
-		return "|cFF005500" -- Dark green
+		return "|cFF005500"
 	elseif perc >= .9 then
-		return "|cFF00AA00" -- Green
+		return "|cFF00AA00"
 	elseif perc > .5 then
-		return "|cFFFFFF00" -- Yellow
+		return "|cFFFFFF00"
 	elseif perc > .2 then
-		return "|cFFFF9900" -- Orange
+		return "|cFFFF9900"
 	else
-		return "|cFFFF0000" -- Red
+		return "|cFFFF0000"
 	end
 end
 
@@ -200,40 +166,19 @@ local DurabilityText = function(num)
 	end
 end
 
----------------------------------
--- Durability updates and repair
----------------------------------
 function Repair:CreateTooltipSkeleton()
 	local line
 
 	tooltip:AddHeader(headerColor..L["Equipped items"])
 	for i,info in ipairs(slots) do
-		-- Set the empty row
 		info[5] = tooltip:AddLine(
-			textColor..L[info[2]],   -- Slot
-			"   ",                   -- Dur
-			"           "            -- Cost
+			textColor..L[info[2]],   
+			"   ",                   
+			"           "            
 		)
 	end
 
 	tooltip:AddHeader(" ")
-	tooltip:AddHeader(headerColor..L["Inventory"])
-	inventoryLine = tooltip:AddLine(
-		textColor..L["Items in your bags"], -- Slot
-		"..%",                              -- Dur
-		L["Loading"]                        -- Cost
-	)
-
-	tooltip:AddHeader(" ")
-	tooltip:AddHeader(headerColor..L["Total cost"])
-
-	for i=4, 8 do
-		factionLine[i] = tooltip:AddLine(
-			textColor.._G["FACTION_STANDING_LABEL"..i], -- Slot
-			"   ",                                      -- Dur
-			"       "                                   -- Cost
-		)
-	end
 
 	tooltip:AddHeader(" ")
 	tooltip:AddHeader(headerColor..L["Auto repair:"])
@@ -241,13 +186,11 @@ function Repair:CreateTooltipSkeleton()
 
 	local autoRepairState  = Repair:GetState("autoRepair")
 	local guildRepairState = Repair:GetState("guildRepair")
-	local factionRepairState=Repair:GetState("OnlyRepairReaction")
 
 	autoRepairLine  = tooltip:AddLine(autoRepairState.color ..L["Toggle auto-repair"],       " ", L["RightMouse"])
 	if not IsClassic then
 		guildRepairLine = tooltip:AddLine(guildRepairState.color..L["Toggle guild bank-repair"], " ", L["MiddleMouse"])
 	end
-	factionRepairLine=tooltip:AddLine(factionRepairState.color..L["Reputation requirement: "] .. factionRepairState.status, " ", L["Shift-RightMouse"])
 end
 
 do
@@ -263,7 +206,7 @@ do
 		while slots[i] do
 			local info = slots[i]
 
-			durPerc = -1 -- Default: no item equipted
+			durPerc = -1
 			if GetInventoryItemLink("player", info[1]) then
 				dur, max = GetInventoryItemDurability(info[1])
 				if dur and max > 0 then
@@ -271,9 +214,8 @@ do
 					if durPerc < minDur then minDur = durPerc end
 				end
 			end
-			-- Update %
+
 			info[3] = durPerc
-			-- Update cost
 			if C_TooltipInfo and C_TooltipInfo.GetInventoryItem then
 				local tooltipData = C_TooltipInfo.GetInventoryItem("player", info[1])
 				if tooltipData then
@@ -285,13 +227,10 @@ do
 				info[4] = select(3, ShowDurabilityScanner:SetInventoryItem("player", info[1])) or 0
 			end
 
-			-- Add to total cost
 			equippedCost = equippedCost + info[4]
 
-			-- Make ready for the next round
 			i = i + 1
 
-			-- Stop loop
 			if endLoop < GetTime() then
 				return
 			end
@@ -304,10 +243,8 @@ do
 	end
 
 	function Repair:UpdateEquippedDurability()
-		-- Start smal
 		equippedCost = 0;
 
-		-- Reset vars
 		i = 1
 		cost = 0
 		minDur = 1
@@ -328,10 +265,6 @@ function Repair:RenderTotalCost()
 	if not tooltip then return end
 	local m = 1
 	local cost = equippedCost + inventoryCost
-	for i=4, 8 do
-		tooltip:SetCell(factionLine[i], 3, CopperToString(math.floor(cost*m+.5)))
-		m = m - .05
-	end
 end
 
 local AutoRepair = function()
@@ -339,12 +272,10 @@ local AutoRepair = function()
 	local cost, canRepair = GetRepairAllCost()
 	if not canRepair or cost == 0 then return end
 
-	-- Use guildbank to repair
 	if ShowDurabilityDB.autoRepair == 1 then
 		if ShowDurabilityDB.OnlyRepairReaction and ShowDurabilityDB.OnlyRepairReaction > 0 then
 			local reaction = UnitReaction("target","player")
 			if reaction and reaction < ShowDurabilityDB.OnlyRepairReaction then
-				--print("Skipped auto-repair due to faction. is "..tostring(reaction).." want "..ShowDurabilityDB.OnlyRepairReaction)
 				return
 			end
 		end
@@ -385,7 +316,7 @@ function Repair:RepairWithGuildBank()
 	end
 end
 
-do -- Hide from the world
+do
 	local OnEvent
 	local f = CreateFrame("Frame")
 	f:RegisterEvent("ADDON_LOADED")
@@ -416,7 +347,6 @@ do -- Hide from the world
 			local updateDurTime = GetTime() + 1
 			f:SetScript("OnUpdate", function()
 				if updateDurTime < GetTime() then
-					-- Update dur
 					refreshTooltip = 0
 					Repair.UpdateEquippedDurability()
 					f:SetScript("OnUpdate", nil)
@@ -426,31 +356,20 @@ do -- Hide from the world
 	end
 end
 
----------------------------------
--- TOOLTIP
----------------------------------
 local anchorTo
 Repair.OnTooltipShowInternal = function(GameTooltip)
-	--if refreshTooltip + 20 > GetTime() then return end
+	tooltip:SmartAnchorTo(anchorTo)
 
-	-- Anchor
-	--print("Anchor to: "..(anchorTo:GetName() or "nil.."))
-	tooltip:SmartAnchorTo(anchorTo) -- ReAnchor
-
-	-- Update information
 	Repair.UpdateEquippedDurability()
 	Repair.RenderEquippedDurability()
-	Repair.UpdateInventoryCost()
 	Repair.RenderTotalCost()
 
 	refreshTooltip = GetTime()
 end
 --
 function Repair:OnEnter()
-	-- Create tooltip
 	tooltip = LibQTip:Acquire("RepairTooltip", 3, "LEFT", "CENTER", "RIGHT")
 
-	-- Skelet
 	Repair:CreateTooltipSkeleton()
 
 	anchorTo = self
@@ -483,24 +402,18 @@ end
 function Repair:OnClick(button)
 	if button == "RightButton" then
 		if IsShiftKeyDown() then
-			-- Update to next state, and return the new state
 			local state = Repair:SetNextState("OnlyRepairReaction")
 
-			-- Ex: Auto-repair [red]Disabled
 			print(L["Faction repair "]..state.color..state.status)
 
-			-- Update tooltip color
 			if tooltip then
 				tooltip:SetCell(factionRepairLine, 1, state.color..L["Reputation requirement: "] .. state.status)
 			end
 		else
-			-- Update to next state, and return the new state
 			local state = Repair:SetNextState("autoRepair")
 
-			-- Ex: Auto-repair [red]Disabled
 			print(L["Auto-repair "]..state.color..state.status)
 
-			-- Update tooltip color
 			if tooltip then
 				tooltip:SetCell(autoRepairLine, 1, state.color..L["Toggle auto-repair"])
 			end
@@ -508,17 +421,14 @@ function Repair:OnClick(button)
 	elseif guildRepairLine and (button == "MiddleButton" or (IsShiftKeyDown() and button == "LeftButton")) then
 		local state = Repair:SetNextState("guildRepair")
 
-		-- Ex: Guild bank-repair [green]Enable
 		print(L["Guild bank-repair "]..state.color..state.status)
 
-		-- Update tooltip color
 		if tooltip then
 			tooltip:SetCell(guildRepairLine, 1, state.color..L["Toggle guild bank-repair"])
 		end
 	else
 		print("|cFF00FF00"..L["Force durability check."])
 		refreshTooltip = 0
-		--Repair.OnEnter(anchorTo)
 	end
 end
 
@@ -539,10 +449,6 @@ Repair.PopupTooltip = function(self)
 	GameTooltip:Show()
 end
 
---[[
-	Initial code, needs refactoring
-	Spreads load over time when scanning inventory
---]]
 do
 	local gSlot, gBag = 1, 0
 	local cost, dur, maxDur = 0, 1, 1
@@ -555,7 +461,6 @@ do
 
 		while gBag < 5 do
 
-			-- Cost
 			local _, repairCost
 			if C_TooltipInfo and C_TooltipInfo.GetBagItem then
 				local tooltipData = C_TooltipInfo.GetBagItem(gBag, gSlot)
@@ -570,18 +475,15 @@ do
 
 			if repairCost then cost = cost + repairCost end
 
-			-- Dur
 			d, m = GetContainerItemDurability(gBag, gSlot)
 			if d and m then dur = dur + d; maxDur = maxDur + m end
 
-			-- Make ready for the next round
 			gSlot = gSlot + 1
 			if gSlot > GetContainerNumSlots(gBag) then
 				gBag = gBag + 1
 				gSlot = 1
 			end
 
-			-- Stop loop
 			if endLoop < GetTime() then
 				return
 			end
@@ -597,23 +499,6 @@ do
 
 		updateRunning = false
 		f:Hide()
-	end
-
-	function Repair:UpdateInventoryCost()
-		if updateRunning or nextUpdateInventory > GetTime() then return end
-		--nextUpdateInventory = GetTime() + 2 -- Max update every 2 sec
-		updateRunning = true;
-
-		-- Start smal
-		inventoryCost = 0;
-
-		tooltip:SetCell(inventoryLine, 2, "..%")
-		tooltip:SetCell(inventoryLine, 3, L["Loading"])
-		gSlot, gBag = 1, 0
-		cost, dur, maxDur = 0, 1, 1
-
-		local nextTime = GetTime()
-		f:Show()
 	end
 
 	f:Hide()
