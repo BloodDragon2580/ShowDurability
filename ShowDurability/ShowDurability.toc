@@ -1,0 +1,19 @@
+## Interface: 100002
+## Title: Titan Panel [|cffd6266cShowDurability|r]
+## Notes: Show Durability, Repair Costs and more.
+## Author: BloddDragon2580
+## Version: 1.0
+## Dependencies: Titan
+## DefaultState: enabled
+## SavedVariables: ShowDurabilityDB
+
+XML\embeds.xml
+XML\button.xml
+
+Locales\deDE.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Locales\koKR.lua
+
+ShowDurability.lua
