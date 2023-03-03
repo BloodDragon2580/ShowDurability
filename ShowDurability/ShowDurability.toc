@@ -1,8 +1,8 @@
-## Interface: 100005
+## Interface: 100007
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
 ## Author: BloddDragon2580
-## Version: 1.3
+## Version: 1.4
 ## Dependencies: Titan
 ## DefaultState: enabled
 ## SavedVariables: ShowDurabilityDB
