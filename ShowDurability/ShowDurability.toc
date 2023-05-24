@@ -2,10 +2,11 @@
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
 ## Author: BloddDragon2580
-## Version: 1.5
+## Version: 1.6
 ## Dependencies: Titan
 ## DefaultState: enabled
 ## SavedVariables: ShowDurabilityDB
+## IconTexture: Interface\AddOns\ShowDurability\Media\Texture\logo
 
 XML\embeds.xml
 XML\button.xml
