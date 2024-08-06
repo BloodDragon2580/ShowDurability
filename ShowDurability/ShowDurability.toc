@@ -2,7 +2,7 @@
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
 ## Author: BloddDragon2580
-## Version: 2.6
+## Version: 2.7
 ## Dependencies: Titan
 ## DefaultState: enabled
 ## SavedVariables: ShowDurabilityDB
