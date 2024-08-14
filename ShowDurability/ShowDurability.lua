@@ -216,16 +216,16 @@ do
 			end
 
 			info[3] = durPerc
-			if C_TooltipInfo and C_TooltipInfo.GetInventoryItem then
-				local tooltipData = C_TooltipInfo.GetInventoryItem("player", info[1])
-				if tooltipData then
-					TooltipUtil.SurfaceArgs(tooltipData)
-					info[4] = tooltipData.repairCost and tooltipData.repairCost or 0
-				end
-			else
-				ShowDurabilityScanner:ClearLines()
-				info[4] = select(3, ShowDurabilityScanner:SetInventoryItem("player", info[1])) or 0
-			end
+--			if C_TooltipInfo and C_TooltipInfo.GetInventoryItem then
+--				local tooltipData = C_TooltipInfo.GetInventoryItem("player", info[1])
+--				if tooltipData then
+--					TooltipUtil.SurfaceArgs(tooltipData)
+--					info[4] = tooltipData.repairCost and tooltipData.repairCost or 0
+--				end
+--			else
+--				ShowDurabilityScanner:ClearLines()
+--				info[4] = select(3, ShowDurabilityScanner:SetInventoryItem("player", info[1])) or 0
+--			end
 
 			equippedCost = equippedCost + info[4]
 
