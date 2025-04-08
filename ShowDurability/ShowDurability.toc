@@ -1,8 +1,8 @@
-## Interface: 110100
+## Interface: 110105
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
 ## Author: BloddDragon2580
-## Version: 7.1
+## Version: 7.2
 ## Dependencies: Titan
 ## DefaultState: enabled
 ## SavedVariables: ShowDurabilityDB
