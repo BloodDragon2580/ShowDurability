@@ -1,4 +1,4 @@
-## Interface: 120000
+## Interface: 120001
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
 ## Author: BloddDragon2580
