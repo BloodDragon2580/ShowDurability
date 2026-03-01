@@ -1,7 +1,7 @@
 ## Interface: 120001
 ## Title: Titan Panel [|cffd6266cShowDurability|r]
 ## Notes: Show Durability, Repair Costs and more.
-## Author: BloddDragon2580
+## Author: BloodDragon2580
 ## Version: 10.4
 ## Dependencies: Titan
 ## DefaultState: enabled
